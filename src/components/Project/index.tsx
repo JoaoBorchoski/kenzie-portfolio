@@ -1,9 +1,9 @@
 import {
-  Project as ProjectWrapper,
-  ProjectStack,
-  ProjectStackTech,
-  ProjectLink,
-  ProjectLinks,
+    Project as ProjectWrapper,
+    ProjectStack,
+    ProjectStackTech,
+    ProjectLink,
+    ProjectLinks,
 } from "./style";
 
 import { Text } from "@/styles/Text";
@@ -12,75 +12,83 @@ import { FaGithub, FaShare } from "react-icons/fa";
 import { userData } from "@/utils/userData";
 
 interface ReposType {
-  id: number;
-  name: string;
-  language: string;
-  description: string;
-  git_url: string;
-  homepage: string;
+    id: number;
+    name: string;
+    language: string;
+    description: string;
+    git_url: string;
+    homepage: string;
 }
 
 export const Project = (): JSX.Element => {
-  const [repositories, setRepositories] = useState<ReposType[]>([]);
+    const [repositories, setRepositories] = useState<ReposType[]>([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data: Response = await fetch(
-        `https://api.github.com/users/${userData.githubUser}/repos`
-      )
+    useEffect(() => {
+        const fetchData = async () => {
+            const data: Response = await fetch(
+                `https://api.github.com/users/${userData.githubUser}/repos`
+            );
 
-      const json = await data.json();
+            const json = await data.json();
 
-      setRepositories(json);
+            json.map((elem: any) => console.log(elem.git_url.split(":")[1]));
 
-      if (!data.ok) {
-        throw data;
-      }
+            setRepositories(json);
 
-      return json;
-    };
-    fetchData();
-  }, []);
+            if (!data.ok) {
+                throw data;
+            }
 
-  return (
-    <>
-      {repositories?.map((repository) => (
-        <ProjectWrapper key={repository.id}>
-          <Text
-            as="h2"
-            type="heading3"
-            css={{ marginBottom: "$3" }}
-            color="grey1"
-          >
-            {repository.name}
-          </Text>
+            return json;
+        };
+        fetchData();
+    }, []);
 
-          {repository.language && (
-            <ProjectStack>
-              <Text type="body2">Linguagem:</Text>
-              <ProjectStackTech>
-                <Text color="brand1" type="body2">
-                  {repository.language}
-                </Text>
-              </ProjectStackTech>
-            </ProjectStack>
-          )}
+    return (
+        <>
+            {repositories?.map((repository) => (
+                <ProjectWrapper key={repository.id}>
+                    <Text
+                        as="h2"
+                        type="heading3"
+                        css={{ marginBottom: "$3" }}
+                        color="grey1"
+                    >
+                        {repository.name}
+                    </Text>
 
-          <Text type="body1" color="grey2">
-            {repository.description}
-          </Text>
-          <ProjectLinks>
-            <ProjectLink target="_blank" href={repository.git_url}>
-              <FaGithub /> Github Code
-            </ProjectLink>
-            {repository.homepage && (
-              <ProjectLink target="_blank" href={repository.homepage}>
-                <FaShare /> Aplicação
-              </ProjectLink>
-            )}
-          </ProjectLinks>
-        </ProjectWrapper>
-      ))}
-    </>
-  );
+                    {repository.language && (
+                        <ProjectStack>
+                            <Text type="body2">Linguagem:</Text>
+                            <ProjectStackTech>
+                                <Text color="brand1" type="body2">
+                                    {repository.language}
+                                </Text>
+                            </ProjectStackTech>
+                        </ProjectStack>
+                    )}
+
+                    <Text type="body1" color="grey2">
+                        {repository.description}
+                    </Text>
+                    <ProjectLinks>
+                        <ProjectLink
+                            target="_blank"
+                            href={repository.git_url.split(":")[1]}
+                        >
+                            <FaGithub /> Github Code
+                        </ProjectLink>
+                        {repository.homepage && (
+                            <ProjectLink
+                                target="_blank"
+                                href={repository.homepage}
+                            >
+                                <FaShare /> Aplicação
+                            </ProjectLink>
+                        )}
+                    </ProjectLinks>
+                </ProjectWrapper>
+            ))}
+        </>
+    );
 };
